@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <!-- 只扫描业务层 -->
+        <context:component-scan base-package="com.itheima.service"/>
+
+        <!-- 读取数据库配置文件 -->
+        <context:property-placeholder location="classpath:jdbc.properties"/>
+
+        <!-- 创建数据源 -->
+        <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+            <property name="username" value="${jdbc.username}"/>
+            <property name="password" value="${jdbc.password}"/>
+            <property name="url" value="${jdbc.url}"/>
+            <property name="driverClassName" value="${jdbc.driver}"/>
+        </bean>
+
+        <!-- spring整合mybatis框架：将mybatis中所有的对象放在IoC容器中 -->
+        <!-- 创建会话工厂 -->
+        <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+            <!-- 只有这个属性是必须 -->
+            <property name="dataSource" ref="dataSource"/>
+            <!-- 定义实体类的别名 -->
+            <property name="typeAliasesPackage" value="com.itheima.entity"/>
+        </bean>
+
+        <!--
+        这个类做了2件重要的事件：
+         1. 扫描dao接口或它的xml的配置文件上sql语句，并且执行
+         2. 生成dao包下所有接口的代理对象，并且放到容器中
+         -->
+        <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+            <!-- 指定dao的基包 -->
+            <property name="basePackage" value="com.itheima.dao"/>
+        </bean>
+
+
+</beans>
